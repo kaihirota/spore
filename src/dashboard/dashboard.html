@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spore</title>
+<meta name="theme-color" content="#eef0f2">
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground: #eef0f2;
+    --panel: #f8f9fa;
+    --ink: #1c2430;
+    --quiet: #5d6875;
+    --steel: #8a95a3;
+    --rule: #d6dbe1;
+    --merged: #1f8a5b;
+    --waiting: #b97a06;
+    --person: #c2412d;
+    --fix: #2f5fb3;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 17px/1.45 "Archivo", system-ui, sans-serif;
+  }
+  button { font: inherit; }
+  :focus-visible { outline: 3px solid var(--fix); outline-offset: 2px; }
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 28px;
+    padding: 22px 28px 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 750;
+    font-stretch: 112%;
+    letter-spacing: -0.01em;
+  }
+  .trunk-head { font-family: var(--mono); font-size: 15px; color: var(--quiet); }
+  .counters { display: flex; flex-wrap: wrap; gap: 10px 32px; margin-left: auto; min-width: 0; }
+  /* Number on the left, a short label above its detail on the right. */
+  .counter { display: grid; grid-template-columns: auto auto; column-gap: 10px; align-items: center; min-width: 0; }
+  .counter b {
+    grid-row: span 2;
+    font-size: 30px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .counter .label { font-size: 16px; font-weight: 600; white-space: nowrap; }
+  .counter .detail { color: var(--quiet); font-size: 14px; white-space: nowrap; }
+  .counter.waiting.on b { color: var(--waiting); }
+  .counter.person.on b { color: var(--person); }
+
+  main {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    min-height: calc(100vh - 78px);
+  }
+  section { padding: 22px 28px; min-width: 0; overflow-wrap: anywhere; }
+  section + section { border-left: 1px solid var(--rule); }
+  h2 { margin: 0 0 14px; font-size: 17px; font-weight: 700; }
+  h3 { margin: 0 0 10px; font-size: 15px; font-weight: 600; color: var(--quiet); }
+  .lane + .lane { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--rule); }
+  .empty { color: var(--quiet); margin: 0; }
+
+  /* Board cards: one task each, its agent on top. Conflict cards carry a coloured edge by state. */
+  button.card.conflict:hover { border-color: var(--steel); background: #ffffff; }
+  .line { position: relative; list-style: none; margin: 0; padding: 0 0 0 30px; }
+  .line::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: var(--steel);
+    border-radius: 2px;
+  }
+  .stop { position: relative; padding: 0 0 16px; }
+  .stop::before {
+    content: "";
+    position: absolute;
+    left: -27px;
+    top: 4px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--panel);
+    border: 3px solid var(--merged);
+  }
+  .stop.rejoin::before { border-color: var(--fix); background: var(--fix); }
+  /* A resolved conflict curves back onto the trunk line from the left. */
+  .stop.rejoin::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: -14px;
+    width: 26px;
+    height: 24px;
+    border-right: 3px solid var(--fix);
+    border-bottom: 3px solid var(--fix);
+    border-bottom-right-radius: 22px;
+    transform: scaleX(-1);
+    transform-origin: left;
+  }
+  .stop.fresh::before { animation: arrive 0.9s ease-out 1; }
+  @keyframes arrive { from { transform: scale(1.9); opacity: 0.3; } to { transform: scale(1); opacity: 1; } }
+  .stop .goal { font-weight: 600; }
+  .stop .meta { color: var(--quiet); font-size: 15px; }
+  .stop .ago { color: var(--steel); font-variant-numeric: tabular-nums; }
+  .sha { font-family: var(--mono); font-size: 14px; }
+  .from-record {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--fix);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .from-record:hover { text-decoration-thickness: 2px; }
+
+  /* Board cards: one task each, its agent on top. Conflict cards carry a coloured edge by state. */
+  .cards { list-style: none; margin: 0; padding: 0; }
+  .card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 0 0 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    font-size: 16px;
+    line-height: 1.35;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    color: inherit;
+    font: inherit;
+  }
+  .card .who { font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+  .card .num { font-variant-numeric: tabular-nums; }
+  .card .since { color: var(--quiet); font-size: 14px; font-weight: 400; white-space: nowrap; }
+  .card .since .ago { color: inherit; font-variant-numeric: tabular-nums; }
+  .badge {
+    display: inline-grid; place-items: center; flex: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    color: #ffffff; font-size: 12px; font-weight: 700; line-height: 1;
+  }
+  .meta .badge { width: 18px; height: 18px; font-size: 11px; vertical-align: -3px; margin-right: 4px; }
+  .count {
+    display: inline-block; min-width: 24px; margin-left: 6px; padding: 0 7px;
+    border-radius: 11px; background: var(--rule); color: var(--ink);
+    font-size: 14px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .label { flex: none; padding: 1px 8px; border-radius: 10px; background: var(--ground); color: var(--quiet); font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .label.busy { background: rgb(47 95 179 / 0.1); color: var(--fix); }
+  .label.busy::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: currentColor; vertical-align: 1px; animation: busy 1.2s ease-in-out infinite; }
+  .label.person { background: rgb(194 65 45 / 0.1); color: var(--person); }
+  @keyframes busy { 50% { opacity: 0.25; } }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .card-head .who { flex: none; white-space: nowrap; }
+  .card-head .where { text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .goal { margin: 1px 0 2px; }
+  .line-item + .line-item { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--rule); }
+  .who-ok { color: var(--quiet); font-size: 14px; white-space: nowrap; }
+  .card .where, .card .against { color: var(--quiet); font-size: 15px; }
+  .card .clash { color: var(--waiting); font-size: 15px; font-weight: 600; }
+  .card.clashing { border-left: 4px solid var(--waiting); }
+  .card.conflict { border-left: 5px solid var(--waiting); cursor: pointer; }
+  button.card.conflict:hover { border-color: var(--steel); background: #ffffff; }
+  .card.conflict.claimed { border-left-color: var(--fix); }
+  .card.conflict.escalated { border-left-color: var(--person); cursor: default; }
+  .card .reason { color: var(--person); margin: 4px 0 10px; }
+  .card .contradiction { color: var(--person); font-size: 15px; font-weight: 600; }
+  .card .handed { color: var(--fix); font-size: 15px; font-weight: 600; }
+  .card .suggest { margin-top: 4px; padding: 3px 8px; border-radius: 3px; background: rgb(47 95 179 / 0.08); color: var(--fix); font-size: 14px; line-height: 1.3; }
+
+
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* Pill shades are darker than the signal colours so white text stays readable. */
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #fff; white-space: nowrap; }
+  .pill.active { background: var(--quiet); }
+  .pill.merged { background: #17724b; }
+  .pill.queued { background: #8a5a00; }
+  .pill.resolved { background: var(--fix); }
+  .pill.escalated { background: var(--person); }
+  .pill.dismissed, .pill.failed, .pill.handed_off { background: var(--quiet); }
+
+  /* Agents still working: on the approach to trunk, not yet submitted. */
+
+
+  .actions { display: flex; gap: 10px; }
+  .actions button {
+    padding: 7px 14px;
+    border-radius: 3px;
+    border: 1px solid var(--ink);
+    background: var(--panel);
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .actions button:hover:not(:disabled) { background: #ffffff; }
+  .actions button.take { background: var(--ink); color: var(--panel); }
+  .actions button.take:hover:not(:disabled) { background: #000000; }
+  .actions button.confirm { border-color: var(--person); color: var(--person); }
+  .actions button:disabled { opacity: 0.5; cursor: progress; }
+
+  dialog {
+    overscroll-behavior: contain;
+    width: min(1280px, 96vw);
+    max-height: 90vh;
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--ink);
+  }
+  dialog::backdrop { background: rgb(28 36 48 / 0.45); }
+  .dialog-head { display: flex; align-items: baseline; gap: 16px; padding: 18px 22px; border-bottom: 1px solid var(--rule); }
+  .dialog-head h2 { margin: 0; font-size: 20px; }
+  .dialog-head button:hover { background: #ffffff; }
+  .dialog-head button { margin-left: auto; border: 1px solid var(--rule); background: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; color: var(--ink); }
+  .panes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pane { padding: 16px 18px; min-width: 0; }
+  .pane + .pane { border-left: 1px solid var(--rule); }
+  .pane h3 { margin: 0 0 2px; font-size: 16px; }
+  .pane .goal { margin: 0 0 12px; font-weight: 600; }
+  .pane.trunk h3 { color: var(--merged); }
+  .pane.incoming h3 { color: var(--waiting); }
+  .pane.fix h3 { color: var(--fix); }
+  pre {
+    margin: 0;
+    padding: 10px 12px;
+    background: var(--ground);
+    border-radius: 3px;
+    font: 15px/1.55 var(--mono);
+    overflow: auto;
+    max-height: 60vh;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .file-name { display: block; margin: 0 0 4px; color: var(--quiet); font-weight: 500; }
+  details.goal-test { margin-top: 10px; font-size: 15px; color: var(--quiet); }
+  details.goal-test summary { cursor: pointer; }
+  details.goal-test pre { margin-top: 6px; }
+  .add { color: var(--merged); }
+  .del { color: var(--person); }
+
+  .key-form { max-width: 420px; margin: 18vh auto; padding: 0 28px; }
+  .key-form label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .key-form input { width: 100%; padding: 8px 10px; font: 16px var(--mono); border: 1px solid var(--steel); border-radius: 3px; }
+  .error, .notice { color: var(--person); padding: 10px 28px; margin: 0; }
+
+  @media (max-width: 900px) {
+    header, section { padding-left: 16px; padding-right: 16px; }
+    main { grid-template-columns: 1fr; }
+    section + section { border-left: 0; border-top: 1px solid var(--rule); }
+    .panes { grid-template-columns: 1fr; }
+    .pane + .pane { border-left: 0; border-top: 1px solid var(--rule); }
+    .counters { margin-left: 0; gap: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .stop.fresh::before, .label.busy::before { animation: none; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="announce" class="sr-only" aria-live="polite"></div>
+<dialog id="record" aria-labelledby="record-title"></dialog>
+<script>
+const app = document.getElementById("app");
+const dialog = document.getElementById("record");
+let key = new URLSearchParams(location.hash.slice(1)).get("key") || "";
+let state = null;
+let seen = new Set();
+let openRecord = null;
+let lastJson = "";
+
+// Goal tests ride along with every change; listing them beside the code they test is noise.
+const shown = (file) => !file.startsWith("test/goals/");
+const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+const STATE_LABEL = { active: "working", merged: "merged", queued: "queued", resolved: "resolved", escalated: "needs decision", dismissed: "dismissed", failed: "fix failed", handed_off: "handed to a person", open: "waiting", claimed: "being resolved" };
+const label = (state) => STATE_LABEL[state] || state;
+const ago = (at) => {
+  const s = Math.max(0, Math.round((Date.now() - at) / 1000));
+  return s < 60 ? `${s} s ago` : s < 3600 ? `${Math.floor(s / 60)} min ago` : `${Math.floor(s / 3600)} h ago`;
+};
+// Relative times tick in place, so the page never re-renders just to update them.
+setInterval(() => document.querySelectorAll("[data-at]").forEach((el) => (el.textContent = ago(Number(el.dataset.at)))), 1000);
+let announced = null;
+function announce(next) {
+  const merged = new Set(next.merges.map((m) => m.trunkSha));
+  const escalated = new Set(next.records.filter((r) => r.state === "escalated").map((r) => r.id));
+  if (announced) {
+    const lines = [
+      ...next.merges.filter((m) => !announced.merged.has(m.trunkSha)).map((m) => `${m.agent} merged: ${m.goal}`),
+      ...next.records.filter((r) => escalated.has(r.id) && !announced.escalated.has(r.id)).map((r) => `#${r.id} needs a decision: ${r.goal}`),
+    ];
+    if (lines.length) document.getElementById("announce").textContent = lines.join(". ");
+  }
+  announced = { merged, escalated };
+}
+
+async function api(method, path, body) {
+  const response = await fetch(path, {
+    method,
+    headers: { authorization: `Bearer ${key}` },
+    body: body && JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || `${response.status}`);
+  return response.json();
+}
+
+function askForKey(problem) {
+  app.innerHTML = `<form class="key-form"><label for="key">API key</label><input id="key" name="key" type="password" autocomplete="off" required aria-describedby="key-problem">${problem ? `<p id="key-problem" class="error" role="alert">${esc(problem)}</p>` : ""}</form>`;
+  app.querySelector("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    key = app.querySelector("input").value.trim();
+    history.replaceState(null, "", `#key=${encodeURIComponent(key)}`);
+    poll();
+  });
+  app.querySelector("input").focus();
+}
+
+// Each agent keeps one badge colour everywhere, so its cards can be followed across the board.
+function badge(agent) {
+  if (!agent) return "";
+  const resolver = agent.startsWith("resolver");
+  const number = Number(agent.match(/\d+$/)?.[0] ?? [...agent].reduce((n, ch) => n + ch.charCodeAt(0), 0));
+  const mark = resolver ? "R" : (agent.match(/\d+$/)?.[0] ?? agent[0].toUpperCase());
+  // Golden-angle steps keep neighbouring numbers far apart on the colour wheel.
+  const colour = resolver ? "var(--ink)" : `hsl(${Math.round((number * 137.5) % 360)} 55% 38%)`;
+  return `<span class="badge" style="background:${colour}" aria-hidden="true">${esc(mark)}</span>`;
+}
+
+// Cards keep a key across renders; one that changes place glides there, and a new one fades in.
+const still = matchMedia("(prefers-reduced-motion: reduce)");
+function placeCards(update) {
+  const before = new Map([...app.querySelectorAll("[data-key]")].map((el) => [el.dataset.key, el.getBoundingClientRect()]));
+  update();
+  if (still.matches || before.size === 0) return;
+  for (const el of app.querySelectorAll("[data-key]")) {
+    const was = before.get(el.dataset.key);
+    const now = el.getBoundingClientRect();
+    if (!was) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: "ease-out" });
+    else if (Math.abs(was.left - now.left) > 1 || Math.abs(was.top - now.top) > 1) {
+      el.animate([{ transform: `translate(${was.left - now.left}px, ${was.top - now.top}px)` }, { transform: "none" }], { duration: 450, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" });
+    }
+  }
+}
+
+function render() {
+  const { tasks, records, merges, inflight = [] } = state;
+  const now = Date.now();
+  const perMinute = merges.filter((m) => now - m.at < 60_000).length;
+  const waiting = records.filter((r) => r.state === "open" || r.state === "claimed");
+  const escalated = records.filter((r) => r.state === "escalated");
+  const resolving = records.filter((r) => r.state === "claimed").length;
+  const agentOf = (id) => tasks.find((t) => t.id === String(id))?.agent || `task ${id}`;
+  const inflightOf = new Map(inflight.map((t) => [String(t.taskId), t]));
+  const whereOf = (t) => [...new Set(t.changes.filter((c) => shown(c.file)).map((c) => (c.symbol ? `${c.symbol} in ${c.file}` : c.file)))];
+
+  // One card per agent and column, its tasks as lines. Agents whose tasks would clash sit next to each other.
+  const working = tasks.filter((t) => t.resolves == null && t.state === "active");
+  const workingIds = new Set(working.map((t) => t.id));
+  const clashesOf = (id) => (inflightOf.get(id)?.conflictsWith ?? []).map(String).filter((other) => workingIds.has(other));
+  const agentsOf = (list) => [...new Set(list.map((t) => t.agent))];
+  const clashingAgents = (agent) => agentsOf(working.filter((t) => t.agent === agent).flatMap((t) => clashesOf(t.id)).map((id) => working.find((w) => w.id === id))).filter((a) => a !== agent);
+  const ordered = [];
+  const keyOf = new Map();
+  for (const agent of agentsOf(working)) {
+    if (ordered.includes(agent)) continue;
+    const group = [agent];
+    for (let i = 0; i < group.length; i++) for (const other of clashingAgents(group[i])) if (!group.includes(other)) group.push(other);
+    if (group.length > 1) {
+      const symbols = group.map((a) => new Set(working.filter((t) => t.agent === a).flatMap((t) => inflightOf.get(t.id)?.changes ?? []).map((c) => c.symbol).filter(Boolean)));
+      const shared = [...symbols[0]].find((sym) => symbols.every((set) => set.has(sym)));
+      for (const a of group) keyOf.set(a, shared ?? group.join("-"));
+    }
+    ordered.push(...group);
+  }
+  // The coordinator's question and verdict for a task, while they still matter to the agent holding it.
+  const coordination = (t) => {
+    const q = t.question, v = t.verdict;
+    if (v?.decision === "handover" && v.state === "done") return "";
+    if (v) {
+      const what = v.decision === "continue" ? "continue" : v.decision === "drop" ? "drop its change there" : `hand over to ${esc(v.to)}`;
+      const state = v.state === "pending" ? " (checking tests)" : v.state === "refused" ? ` (refused: ${esc(v.reason)})` : "";
+      const answered = q?.answer ? `Answered ${q.answer.required ? "required" : "optional"}. ` : "";
+      return `<div class="suggest" data-suggest="${esc(t.agent)}">${answered}Verdict: ${what}${state}</div>`;
+    }
+    if (!q) return "";
+    if (!q.answer) return `<div class="suggest" data-suggest="${esc(t.agent)}">Coordinator asks: is the change to ${esc(q.about)} required?</div>`;
+    return `<div class="suggest" data-suggest="${esc(t.agent)}">Answered ${q.answer.required ? "required" : "optional"} <span class="who-ok">(waiting for the others)</span></div>`;
+  };
+  // Warnings matter while an agent is working; once it has submitted, the integrator handles the rest.
+  const taskLine = (t, many, working = true) => {
+    const flight = inflightOf.get(t.id);
+    const clashes = working ? clashesOf(t.id).map(agentOf) : [];
+    // Its own agent's earlier change is not a clash: the agent rebuilds on top of it.
+    const trunk = working ? (flight?.conflictsWithTrunk ?? []).map(agentOf).filter((a) => a !== t.agent) : [];
+    const contradiction = working ? t.contradiction : null;
+    return `<div class="line-item" data-key="task-${t.id}">
+      <div class="goal">${esc(t.goal)}</div>
+      ${many ? `<div class="where">${flight ? esc(whereOf(flight).join(", ")) : "no push yet"}</div>` : ""}
+      ${contradiction ? `<div class="contradiction" title="${esc(contradiction.reason)}">contradicts ${esc(contradiction.agent)}</div>`
+        : clashes.length ? `<div class="clash">clashes with ${esc(clashes.join(", "))}</div>` : ""}
+      ${trunk.length ? `<div class="clash">trunk already changed these lines: ${esc(trunk.join(", "))}</div>` : ""}
+      ${t.handedFrom ? `<div class="handed">handed over by ${esc(t.handedFrom)}</div>` : ""}
+      ${working ? coordination(t) : ""}
+    </div>`;
+  };
+  const agentCard = (agent, list, column, label = "") => {
+    const flight = list.length === 1 ? inflightOf.get(list[0].id) : null;
+    const side = label ? `<span class="label busy">${esc(label)}</span>`
+      : list.length > 1 ? `<span class="where">${list.length} tasks</span>`
+      : `<span class="where" title="${flight ? esc(whereOf(flight).join(", ")) : ""}">${flight ? esc(whereOf(flight).join(", ")) : "no push yet"}</span>`;
+    const clashing = column === "progress" && list.some((t) => clashesOf(t.id).length);
+    const started = Math.min(...list.map((t) => t.startedAt || Infinity));
+    const since = column === "progress" && Number.isFinite(started) ? `<span class="since">started <span class="ago" data-at="${started}">${ago(started)}</span></span>` : "";
+    return `<li class="card${clashing ? " clashing" : ""}" data-key="${column}-${esc(agent)}" data-agent="${esc(agent)}"${keyOf.has(agent) && column === "progress" ? ` data-clash="${esc(keyOf.get(agent))}"` : ""}>
+      <div class="card-head"><span class="who">${badge(agent)}${esc(agent)}${since}</span>${side}</div>
+      ${list.map((t) => taskLine(t, list.length > 1, column === "progress")).join("")}
+    </li>`;
+  };
+  const inProgress = ordered.map((agent) => agentCard(agent, working.filter((t) => t.agent === agent), "progress")).join("");
+
+  const mergingTasks = tasks.filter((t) => t.resolves == null && t.state === "submitted");
+  const merging = agentsOf(mergingTasks).map((agent) => agentCard(agent, mergingTasks.filter((t) => t.agent === agent), "merging", "merging and testing")).join("");
+
+  // Conflict: each record, assigned to the resolver whose task is fixing it.
+  const fixers = tasks.filter((t) => t.resolves != null);
+  const conflicts = [...waiting, ...escalated].map((r) => {
+    const author = tasks.find((t) => t.record === r.id && t.resolves == null)?.agent;
+    const fixer = fixers.filter((t) => t.resolves === r.id).at(-1);
+    const against = r.clashingTasks.length ? `${r.clashingTasks.map(agentOf).join(", ")}: ${r.clashingGoal}` : r.clashingGoal || "trunk";
+    const [status, tone] = r.state === "escalated" ? ["needs a decision", "person"]
+      : fixer?.state === "submitted" ? ["fix merging", "busy"]
+      : r.state === "claimed" ? [`${fixer?.agent ?? "resolver"} working`, "busy"]
+      : r.attempts ? ["waiting to retry", ""] : ["waiting", ""];
+    const body = `<div class="card-head"><span class="who"><span class="num">#${r.id}</span>${badge(author)}${esc(author ?? "")}</span><span class="label ${tone}">${esc(status)}</span></div>
+      <div class="goal">${esc(r.goal)}</div>
+      <div class="against">against ${esc(against)}</div>`;
+    return r.state === "escalated"
+      ? `<li class="card conflict escalated" data-key="record-${r.id}" data-region="decision">${body}
+          <div class="reason">${esc(r.reason)}</div>
+          <div class="actions">
+            <button data-decide="${r.id}" data-keep="trunk">Keep trunk</button>
+            <button class="take" data-decide="${r.id}" data-keep="incoming">Take incoming</button>
+            <button data-record="${r.id}">View</button>
+          </div></li>`
+      : `<li data-key="record-${r.id}"><button class="card conflict ${r.state}" data-record="${r.id}">${body}</button></li>`;
+  }).join("");
+
+  const stops = merges.map((m) => {
+    const fresh = !seen.has(m.trunkSha) && seen.size > 0;
+    return `<li class="stop${m.record ? " rejoin" : ""}${fresh ? " fresh" : ""}" data-key="task-${m.taskId}">
+      <div class="goal">${esc(m.goal)}</div>
+      <div class="meta"><span class="sha">${esc(m.trunkSha.slice(0, 7))}</span> by ${badge(m.agent)}${esc(m.agent)}${(() => {
+        const from = tasks.find((t) => t.id === m.taskId)?.handedFrom;
+        return from ? ` (from ${badge(from)}${esc(from)})` : "";
+      })()}, ${esc(m.files.filter(shown).join(", "))} <span class="ago" data-at="${m.at}">${ago(m.at)}</span></div>
+      ${m.record ? `<button class="from-record" data-record="${m.record}">rejoined from #${m.record}</button>` : ""}
+    </li>`;
+  }).join("");
+  seen = new Set(merges.map((m) => m.trunkSha));
+
+  const count = (n) => `<span class="count">${n}</span>`;
+  placeCards(() => (app.innerHTML = `
+    <header>
+      <h1>Spore</h1>
+      <span class="trunk-head">trunk ${esc(merges[0]?.trunkSha.slice(0, 7) || "")}</span>
+      <div class="counters" data-region="counters">
+        <div class="counter"><b>${merges.length}</b><span class="label">merged</span><span class="detail">${perMinute} in the last minute</span></div>
+        <div class="counter waiting${waiting.length ? " on" : ""}"><b>${waiting.length}</b><span class="label">in the queue</span><span class="detail">${resolving} being resolved</span></div>
+        <div class="counter person${escalated.length ? " on" : ""}"><b>${escalated.length}</b><span class="label">need a decision</span></div>
+      </div>
+    </header>
+    <main class="board">
+      <section aria-label="In Progress" data-region="inprogress">
+        <h2>In Progress ${count(ordered.length)}</h2>
+        ${inProgress ? `<ul class="cards">${inProgress}</ul>` : `<p class="empty">No tasks in progress.</p>`}
+      </section>
+      <section aria-label="Review">
+        <h2>Review ${count(agentsOf(mergingTasks).length + waiting.length + escalated.length)}</h2>
+        <div class="lane" data-region="merging">
+          <h3>Merging</h3>
+          ${merging ? `<ul class="cards">${merging}</ul>` : `<p class="empty">Nothing merging.</p>`}
+        </div>
+        <div class="lane" data-region="queue">
+          <h3>Conflict</h3>
+          ${conflicts ? `<ul class="cards">${conflicts}</ul>` : `<p class="empty">No conflicts.</p>`}
+        </div>
+      </section>
+      <section aria-label="Done (Trunk)" data-region="trunk">
+        <h2>Done (Trunk) ${count(merges.length)}</h2>
+        ${stops ? `<ol class="line">${stops}</ol>` : `<p class="empty">No merges yet.</p>`}
+      </section>
+    </main>`));
+}
+
+// The conflict hunk holds both sides: lines before ======= are trunk's, lines after are the incoming change's.
+function splitHunks(hunks) {
+  const trunk = [];
+  const incoming = [];
+  let side = null;
+  for (const raw of hunks.split("\n")) {
+    if (raw.startsWith("diff ") || raw.startsWith("index ") || raw.startsWith("--- ") || raw.startsWith("+++ ")) continue;
+    const line = raw.slice(2);
+    if (line.startsWith("<<<<<<<")) { side = "trunk"; continue; }
+    if (line.startsWith("|||||||")) { side = "base"; continue; }
+    if (line.startsWith("=======")) { side = "incoming"; continue; }
+    if (line.startsWith(">>>>>>>")) { side = null; continue; }
+    if (raw.startsWith("@@")) { trunk.push(raw); incoming.push(raw); continue; }
+    if (side === "trunk") trunk.push(line);
+    else if (side === "incoming") incoming.push(line);
+    else if (side === null) { trunk.push(line); incoming.push(line); }
+  }
+  return { trunk: trunk.join("\n"), incoming: incoming.join("\n") };
+}
+
+const colourDiff = (diff) => esc(diff).split("\n").filter((line) => !/^(diff --git|index |--- |\+\+\+ )/.test(line)).map((line) =>
+  line.startsWith("+") && !line.startsWith("+++") ? `<span class="add">${line}</span>`
+  : line.startsWith("-") && !line.startsWith("---") ? `<span class="del">${line}</span>`
+  : line).join("\n");
+
+// The fix's own code first; goal tests that came with it are folded away underneath.
+function fixDiff(diff) {
+  const files = diff.split(/^(?=diff --git )/m).filter(Boolean).map((block) => ({ name: block.match(/^diff --git a\/\S+ b\/(\S+)/)?.[1] ?? "", block }));
+  const code = files.filter((f) => shown(f.name));
+  const tests = files.filter((f) => !shown(f.name));
+  const one = (f) => `<pre><span class="file-name">${esc(f.name)}</span>${colourDiff(f.block)}</pre>`;
+  return code.map(one).join("") + (tests.length ? `<details class="goal-test"><summary>${tests.length === 1 ? "Goal test" : `${tests.length} goal tests`} in this change</summary>${tests.map(one).join("")}</details>` : "");
+}
+
+async function showRecord(id) {
+  openRecord = id;
+  const record = await api("GET", `/records/${id}`);
+  const fix = record.fix;
+  const sides = record.kind === "merge" ? splitHunks(record.detail) : { trunk: "", incoming: record.detail };
+  const fixBody = fix
+    ? `<p class="goal">${esc(fix.goal)} by ${esc(fix.agent)}</p>${fixDiff(fix.diff)}`
+    : `<p class="goal">${esc({ open: "Waiting for a resolver.", claimed: "A resolver is working on it.", escalated: record.reason, dismissed: "Closed; trunk kept." }[record.state] || "")}</p>`;
+  dialog.innerHTML = `
+    <div class="dialog-head">
+      <h2 id="record-title">#${record.id} in ${esc(record.files.join(", ") || "tests")}</h2>
+      <span class="pill ${record.state === "open" || record.state === "claimed" ? "queued" : record.state}">${label(record.state)}</span>
+      <button type="button" data-close>Close</button>
+    </div>
+    <div class="panes">
+      <div class="pane trunk"><h3>Trunk</h3><p class="goal">${esc(record.clashingGoal || "Current trunk")}</p><pre>${esc(sides.trunk)}</pre></div>
+      <div class="pane incoming"><h3>Incoming</h3><p class="goal">${esc(record.goal)}</p><pre>${esc(sides.incoming)}</pre></div>
+      <div class="pane fix"><h3>Fix</h3>${fixBody}</div>
+    </div>`;
+  if (!dialog.open) dialog.showModal();
+}
+
+document.addEventListener("click", async (event) => {
+  const target = event.target.closest("[data-record], [data-decide], [data-close]");
+  if (!target) return;
+  if (target.dataset.close !== undefined) { dialog.close(); openRecord = null; return; }
+  if (target.dataset.record) { showRecord(Number(target.dataset.record)); return; }
+  const id = target.dataset.decide;
+  // Keeping trunk discards the incoming change, so it takes a second click.
+  if (target.dataset.keep === "trunk" && !target.classList.contains("confirm")) {
+    target.classList.add("confirm");
+    target.textContent = "Discard incoming change";
+    setTimeout(() => { target.classList.remove("confirm"); target.textContent = "Keep trunk"; }, 4000);
+    return;
+  }
+  target.parentElement.querySelectorAll("button").forEach((b) => (b.disabled = true));
+  try {
+    const result = await api("POST", `/records/${id}/decide`, { keep: target.dataset.keep });
+    if (result.status === "merged" || result.status === "dismissed") setNotice("");
+    else setNotice(`#${id} still needs a decision: the incoming side ${result.status === "tests_failed" ? "failed the tests" : "did not merge"}.`);
+  } catch (error) {
+    setNotice(`Decision on #${id} failed: ${error.message}`);
+  }
+  await refresh(true);
+});
+dialog.addEventListener("close", () => (openRecord = null));
+
+// Decision outcomes stay on screen until the next decision; poll errors clear on the next good poll.
+function setNotice(message) {
+  let line = document.getElementById("notice");
+  if (!line) {
+    line = document.createElement("p");
+    line.id = "notice";
+    line.className = "notice";
+    line.setAttribute("role", "status");
+    document.body.prepend(line);
+  }
+  line.textContent = message;
+  line.hidden = !message;
+}
+
+function alertLine(message) {
+  let line = document.getElementById("error");
+  if (!line) {
+    line = document.createElement("p");
+    line.id = "error";
+    line.className = "error";
+    line.setAttribute("role", "alert");
+    document.body.prepend(line);
+  }
+  line.textContent = message;
+}
+
+// Re-render only when the data or the per-minute count changes, so keyboard focus survives the poll.
+function apply(next, force = false) {
+  const recent = next.merges.filter((m) => Date.now() - m.at < 60_000).length;
+  const json = JSON.stringify(next) + recent;
+  document.getElementById("error")?.remove();
+  if (json === lastJson && !force) return;
+  lastJson = json;
+  announce(next);
+  state = next;
+  render();
+  if (openRecord !== null && dialog.open) showRecord(openRecord);
+}
+
+async function refresh(force = false) {
+  apply(await api("GET", "/state"), force);
+}
+
+// The integrator pushes its state over this socket as it changes; polling covers any time it is down.
+let socket = null;
+function connect() {
+  socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/live`, ["spore", key]);
+  socket.onmessage = (event) => apply(JSON.parse(event.data));
+  socket.onclose = () => setTimeout(() => (socket = null), 3000);
+}
+
+async function poll() {
+  if (!socket) connect();
+  try {
+    // While live, only the "in the last minute" count needs a clock.
+    if (socket.readyState === WebSocket.OPEN && state) apply(state);
+    else await refresh();
+  } catch (error) {
+    if (error.message === "unauthorized") return askForKey(key ? "That key was rejected." : "");
+    alertLine(`Could not load state: ${error.message}`);
+  }
+  setTimeout(poll, 1000);
+}
+
+key ? poll() : askForKey();
+</script>
+</body>
+</html>

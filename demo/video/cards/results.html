@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore results</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: #eef0f2; color: #1c2430; overflow: hidden; font-family: "Archivo", sans-serif; }
+  h1 { position: absolute; left: 200px; top: 90px; margin: 0; font-size: 60px; font-weight: 750; font-stretch: 112%; }
+  .sub { position: absolute; left: 200px; top: 176px; font-size: 30px; color: #5d6875; }
+  table { position: absolute; left: 200px; top: 270px; width: 1520px; border-collapse: collapse; font-size: 38px; }
+  th { text-align: left; font-weight: 650; font-size: 30px; color: #5d6875; padding: 0 0 18px; }
+  th.n, td.n { text-align: right; width: 360px; }
+  td { padding: 22px 0; border-top: 1.5px solid #c9ced5; font-weight: 600; }
+  td.label { font-weight: 500; }
+  .spore { color: #17724b; }
+  .git { color: #c2412d; }
+  .same { color: #1c2430; }
+  .note { font-size: 26px; color: #5d6875; font-weight: 500; display: block; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>48 tasks, 16 agents, one Artifacts trunk</h1>
+<div class="sub">Same tasks, agents and goal tests; only how changes reach trunk differs</div>
+<table>
+  <thead><tr><th></th><th class="n">Spore</th><th class="n">Plain git</th></tr></thead>
+  <tbody>
+    <tr id="r0"><td class="label">Goals on trunk, trunk green</td><td class="n same">46 of 48</td><td class="n same">46 of 48</td></tr>
+    <tr id="r1"><td class="label">Agent time blocked on version control</td><td class="n spore">3 s</td><td class="n git">24.3 agent-min</td></tr>
+    <tr id="r2"><td class="label">Conflicts an agent redid</td><td class="n spore">0</td><td class="n git">101</td></tr>
+    <tr id="r3"><td class="label">Agents finished every task</td><td class="n spore">1.1 min</td><td class="n git">3.6 min</td></tr>
+    <tr id="r4"><td class="label">Trunk settled</td><td class="n git">4.8 min</td><td class="n spore">3.6 min</td></tr>
+    <tr id="r5"><td class="label">Trunk settled, 30 s to redo a change</td><td class="n spore">4.8 min</td><td class="n git">8.1 min</td></tr>
+  </tbody>
+</table>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+
+/** Draws the card t seconds into the narration, given window.CUES = { rows: [seconds each row appears] }. */
+window.setTime = (t) => {
+  window.CUES.rows.forEach((at, i) => {
+    const row = document.getElementById(`r${i}`);
+    row.style.opacity = ease((t - at) / 0.45);
+    row.style.transform = `translateY(${(1 - ease((t - at) / 0.45)) * 14}px)`;
+  });
+};
+</script>
+</body>
+</html>

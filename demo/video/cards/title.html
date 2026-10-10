@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore title</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: #eef0f2; color: #1c2430; overflow: hidden; font-family: "Archivo", sans-serif; }
+  .mark { position: absolute; left: 240px; font-weight: 800; font-stretch: 125%; letter-spacing: -0.02em; line-height: 1; transform-origin: left top; }
+  .rows { position: absolute; left: 240px; top: 420px; font-size: 64px; font-weight: 650; font-stretch: 112%; }
+  .row { position: relative; margin: 0 0 28px; width: fit-content; }
+  .row .strike { position: absolute; left: -8px; top: 52%; height: 6px; background: #c2412d; border-radius: 3px; }
+  .ideas { position: absolute; left: 1060px; top: 420px; font-size: 44px; font-weight: 600; line-height: 1.25; }
+  .idea { margin: 0 0 30px; padding-left: 28px; border-left: 6px solid #2f5fb3; }
+</style>
+</head>
+<body>
+<div class="mark" id="mark">Spore</div>
+<div class="rows">
+  <div class="row" id="pr">Pull request<div class="strike"></div></div>
+  <div class="row" id="lock">Lock<div class="strike"></div></div>
+</div>
+<div class="ideas">
+  <div class="idea" id="idea-1">Every goal test stays green</div>
+  <div class="idea" id="idea-2">Git decides what conflicts</div>
+  <div class="idea" id="idea-3">Agents hear about each other</div>
+  <div class="idea" id="idea-4">A conflict becomes work</div>
+</div>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const lerp = (a, b, k) => a + (b - a) * k;
+
+/** Draws the card t seconds into the narration, given window.CUES = { spore, pr, prStrike, lock, lockStrike, ideas: [..] }. */
+window.setTime = (t) => {
+  const c = window.CUES;
+  const mark = document.getElementById("mark");
+  // The name appears centred-left, then shrinks to the top before the first idea or the comparison appears.
+  const shrink = ease((t - Math.min(c.pr, c.ideas[0]) + 0.4) / 0.6);
+  mark.style.opacity = ease((t - c.spore) / 0.5);
+  mark.style.fontSize = `${lerp(260, 96, shrink)}px`;
+  mark.style.top = `${lerp(380, 140, shrink)}px`;
+  for (const [id, appear, strike] of [["pr", c.pr, c.prStrike], ["lock", c.lock, c.lockStrike]]) {
+    const row = document.getElementById(id);
+    row.style.opacity = ease((t - appear) / 0.4) * lerp(1, 0.45, ease((t - strike) / 0.5));
+    row.querySelector(".strike").style.width = `calc(${ease((t - strike) / 0.5) * 100}% + 16px)`;
+    row.querySelector(".strike").style.opacity = t >= strike ? 1 : 0;
+  }
+  c.ideas.forEach((at, i) => {
+    const el = document.getElementById(`idea-${i + 1}`);
+    el.style.opacity = ease((t - at) / 0.45);
+    el.style.transform = `translateY(${lerp(16, 0, ease((t - at) / 0.45))}px)`;
+  });
+};
+</script>
+</body>
+</html>

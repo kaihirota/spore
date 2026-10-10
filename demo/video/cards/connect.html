@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore connect</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: #eef0f2; color: #1c2430; overflow: hidden; font-family: "Archivo", sans-serif; }
+  .term { position: absolute; left: 170px; top: 110px; width: 1580px; height: 800px; background: #1c2430; border-radius: 18px; padding: 50px 60px; box-sizing: border-box;
+    font-family: "JetBrains Mono", monospace; font-size: 29px; line-height: 1.55; color: #d8dee6; }
+  .step { margin: 0 0 34px; }
+  .cmd::before { content: "$ "; color: #7f8b99; }
+  .cmd { color: #ffffff; font-weight: 600; white-space: pre-wrap; }
+  .out { color: #9fb3c8; white-space: pre-wrap; }
+  .ok { color: #7fd1a4; }
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="step" id="s0">
+    <div class="cmd">npm run setup</div>
+    <div class="out"><span class="ok">Spore is running at</span> https://spore.&lt;you&gt;.workers.dev
+Dashboard: https://spore.&lt;you&gt;.workers.dev/#key=…</div>
+  </div>
+  <div class="step" id="s1">
+    <div class="cmd">curl -X POST $SPORE/agents -d '{"agent":"claude-1"}'</div>
+    <div class="out">{"agent":"claude-1","key":"spa_claude-1.4f9c…"}</div>
+  </div>
+  <div class="step" id="s2">
+    <div class="cmd">claude mcp add --transport http spore $SPORE/mcp \
+    --header "Authorization: Bearer spa_claude-1.4f9c…"</div>
+    <div class="out">start_task  report_push  task_status  touching  why
+answer  task_access  submit  list_tasks</div>
+  </div>
+</div>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+
+/** Draws the card t seconds into the narration, given window.CUES = { steps: [seconds each command appears] }. */
+window.setTime = (t) => {
+  window.CUES.steps.forEach((at, i) => {
+    const step = document.getElementById(`s${i}`);
+    step.style.opacity = ease((t - at) / 0.4);
+  });
+};
+</script>
+</body>
+</html>

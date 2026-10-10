@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: #eef0f2; overflow: hidden; }
+  svg { position: absolute; left: 50%; top: 24px; height: 930px; transform: translateX(-50%); font-family: "Archivo", sans-serif; }
+  .box .base { fill: #f8f9fa; stroke: #8a95a3; stroke-width: 1.25; }
+  .box .hl { fill: rgba(47, 95, 179, 0.1); stroke: #2f5fb3; stroke-width: 2.5; }
+  .box.trunk .base { fill: rgba(31, 138, 91, 0.1); stroke: #1f8a5b; stroke-width: 2; }
+  .edge .base { fill: none; stroke: #8a95a3; stroke-width: 1.25; }
+  .edge .hl { fill: none; stroke: #2f5fb3; stroke-width: 2.5; }
+  .name { font-size: 13px; font-weight: 650; fill: #1c2430; text-anchor: middle; }
+  .inner { font-size: 13px; fill: #1c2430; text-anchor: middle; }
+  .sub, .label { font-size: 11.5px; fill: #5d6875; }
+  .sub { text-anchor: middle; }
+  .title { font-size: 15px; font-weight: 650; fill: #1c2430; }
+</style>
+</head>
+<body>
+<svg viewBox="14 14 736 660" role="img" aria-label="Spore architecture">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8a95a3"/></marker>
+    <marker id="arrow-hl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2f5fb3"/></marker>
+  </defs>
+  <text class="title" x="24" y="34">Only the integrator writes trunk; pushes tell it who is touching what</text>
+
+  <g id="e-http" class="edge"><path d="M204 110H282"/><text class="label" x="244" y="102" text-anchor="middle">HTTP</text></g>
+  <g id="e-push" class="edge"><path d="M114 164V298"/><text class="label" x="124" y="240">git push</text></g>
+  <g id="e-event" class="edge"><path d="M204 326H282"/><text class="label" x="244" y="302" text-anchor="middle">push event</text><text class="label" x="244" y="316" text-anchor="middle">via Queue</text></g>
+  <g id="e-submit" class="edge"><path d="M384 136V194"/><text class="label" x="394" y="170">submit, touching, decide</text></g>
+  <g id="e-serial" class="edge"><path d="M384 446V488"/><text class="label" x="394" y="470">one at a time</text></g>
+  <g id="e-trunk" class="edge"><path d="M384 550V608"/><text class="label" x="394" y="584">git push, only writer</text></g>
+  <g id="e-fetch" class="edge"><path d="M284 520H114V354"/><text class="label" x="200" y="512" text-anchor="middle">fetch fork</text></g>
+  <g id="e-live" class="edge"><path d="M484 230H562"/><text class="label" x="524" y="222" text-anchor="middle">live state</text></g>
+  <g id="e-escalated" class="edge"><path d="M650 272V328"/><text class="label" x="640" y="305" text-anchor="end">escalated</text></g>
+  <g id="e-model" class="edge"><path d="M468 420H562"/><text class="label" x="524" y="412" text-anchor="middle">model</text></g>
+
+  <g id="b-swarm" class="box"><rect x="24" y="60" width="180" height="104" rx="8"/><text class="name" x="114" y="84">Swarm</text></g>
+  <g id="b-agents" class="box"><rect x="40" y="96" width="148" height="52" rx="8"/><text class="inner" x="114" y="118">Agents</text><text class="sub" x="114" y="136">push early, keep working</text></g>
+  <g id="b-forks" class="box"><rect x="24" y="300" width="180" height="52" rx="8"/><text class="name" x="114" y="322">Forks</text><text class="sub" x="114" y="340">one per task (Artifacts)</text></g>
+  <g id="b-gateway" class="box"><rect x="284" y="60" width="200" height="76" rx="8"/><text class="name" x="384" y="84">Gateway Worker</text><text class="sub" x="384" y="104">tasks, submit, touching,</text><text class="sub" x="384" y="120">decide, why</text></g>
+  <g id="b-integrator" class="box"><rect x="284" y="196" width="200" height="250" rx="8"/><text class="name" x="384" y="220">Integrator</text><text class="sub" x="384" y="238">Durable Object per repo</text></g>
+  <g id="b-inflight" class="box"><rect x="300" y="254" width="168" height="52" rx="8"/><text class="inner" x="384" y="276">In flight</text><text class="sub" x="384" y="294">changes and warnings</text></g>
+  <g id="b-queue" class="box"><rect x="300" y="316" width="168" height="52" rx="8"/><text class="inner" x="384" y="338">Conflict queue</text><text class="sub" x="384" y="356">records and leases</text></g>
+  <g id="b-resolver" class="box"><rect x="300" y="378" width="168" height="52" rx="8"/><text class="inner" x="384" y="400">Resolver</text><text class="sub" x="384" y="418">runs on an alarm</text></g>
+  <g id="b-container" class="box"><rect x="284" y="490" width="200" height="60" rx="8"/><text class="name" x="384" y="514">Container</text><text class="sub" x="384" y="534">inspect, merge, test</text></g>
+  <g id="b-trunk" class="box trunk"><rect x="284" y="610" width="200" height="52" rx="8"/><text class="name" x="384" y="632">Trunk (Artifacts)</text><text class="sub" x="384" y="650">only moves forward</text></g>
+  <g id="b-ai" class="box"><rect x="564" y="400" width="172" height="56" rx="8"/><text class="name" x="650" y="424">Workers AI</text><text class="sub" x="650" y="442">resolves both goals</text></g>
+  <g id="b-dashboard" class="box"><rect x="564" y="196" width="172" height="76" rx="8"/><text class="name" x="650" y="220">Dashboard</text><text class="sub" x="650" y="240">in flight, queue,</text><text class="sub" x="650" y="256">record view</text></g>
+  <g id="b-human" class="box"><rect x="564" y="330" width="172" height="56" rx="8"/><text class="name" x="650" y="354">Human</text><text class="sub" x="650" y="372">escalation inbox</text></g>
+</svg>
+<script>
+// Each box and edge gets a highlight copy drawn over its base shape; setTime blends them.
+const elements = [...document.querySelectorAll(".box, .edge")];
+for (const el of elements) {
+  const shape = el.querySelector("rect, path");
+  shape.classList.add("base");
+  const hl = shape.cloneNode();
+  hl.classList.replace("base", "hl");
+  if (el.classList.contains("edge")) {
+    shape.setAttribute("marker-end", "url(#arrow)");
+    hl.setAttribute("marker-end", "url(#arrow-hl)");
+  }
+  shape.after(hl);
+}
+
+const FADE = 0.35;
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+
+/** Draws the diagram as it is t seconds into the narration, given window.CUES = [{ at, ids }]. */
+window.setTime = (t) => {
+  const cues = window.CUES || [];
+  document.querySelector("svg").style.opacity = clamp(t / 0.8);
+  let i = -1;
+  while (i + 1 < cues.length && cues[i + 1].at <= t) i++;
+  const before = new Set(i > 0 ? cues[i - 1].ids : []);
+  const now = new Set(i >= 0 ? cues[i].ids : []);
+  const k = i >= 0 ? clamp((t - cues[i].at) / FADE) : 1;
+  for (const el of elements) {
+    const id = el.id;
+    const dim = (set) => (set.size > 0 && !set.has(id) ? 0.3 : 1);
+    el.style.opacity = lerp(dim(before), dim(now), k);
+    el.querySelector(".hl").style.opacity = lerp(before.has(id) ? 1 : 0, now.has(id) ? 1 : 0, k);
+  }
+};
+window.setTime(0);
+</script>
+</body>
+</html>

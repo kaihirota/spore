@@ -1,0 +1,9 @@
+node_modules/
+.wrangler/
+.dev.vars
+.zvec-grep/
+demo/video/out/
+dist/
+.DS_Store
+competitors.md
+.env.local

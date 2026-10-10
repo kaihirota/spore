@@ -1,0 +1,24 @@
+{
+  "name": "spore",
+  "version": "1.0.0",
+  "description": "A swarm of agents changes one codebase on Cloudflare without anyone waiting: conflicts become queued work for resolver agents.",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
+    "deploy": "WRANGLER_DOCKER_BIN=./scripts/docker-buildx wrangler deploy",
+    "setup": "node scripts/setup.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "playwright": "^1.63.0",
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.7",
+    "wrangler": "^4.147.0"
+  }
+}

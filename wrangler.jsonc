@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "spore",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "artifacts": [{ "binding": "ARTIFACTS", "namespace": "spore" }],
+  "containers": [{ "class_name": "IntegratorObject", "image": "./Dockerfile", "instance_type": "standard-1", "max_instances": 2 }],
+  "durable_objects": {
+    "bindings": [{ "name": "INTEGRATOR", "class_name": "IntegratorObject" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["IntegratorObject"] }],
+  "ai": { "binding": "AI" },
+  "queues": { "consumers": [{ "queue": "spore-pushes", "max_batch_size": 10, "max_batch_timeout": 1 }] },
+  "vars": { "TRUNK_REPO": "trunk", "TEST_COMMAND": "npm test", "RESOLVER_MODEL": "@cf/moonshotai/kimi-k2.7-code",
+    "ARTIFACTS_NAMESPACE": "spore",
+    "RESOLVER": "on"
+  }
+}

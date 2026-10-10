@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore code view</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: #eef0f2; color: #1c2430; overflow: hidden; }
+  .file { position: absolute; left: 330px; top: 150px; font: 600 26px "Archivo", sans-serif; color: #5d6875; }
+  .code { position: absolute; left: 330px; top: 210px; width: 1260px; padding: 28px 0; background: #f8f9fa; border: 1px solid #d6dbe1; border-radius: 6px; font: 30px/1.6 "IBM Plex Mono", monospace; }
+  .row { position: relative; display: flex; padding: 0 36px; }
+  .row .n { width: 56px; color: #8a95a3; text-align: right; margin-right: 32px; flex: none; }
+  .row .band { position: absolute; inset: 0; opacity: 0; }
+  .row .tag { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); font: 600 24px "Archivo", sans-serif; opacity: 0; }
+  .row .text { position: relative; white-space: pre; }
+</style>
+</head>
+<body>
+<div class="file">src/flags.js</div>
+<div class="code" id="code"></div>
+<script>
+/** Draws the card t seconds into the narration, given window.CUES = { lines, marks: [{ line, at, color, tag }] }. */
+window.setTime = (t) => {
+  const c = window.CUES;
+  const code = document.getElementById("code");
+  if (!code.children.length) {
+    c.lines.forEach((text, i) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<div class="band"></div><span class="n">${i + 1}</span><span class="text"></span><span class="tag"></span>`;
+      row.querySelector(".text").textContent = text;
+      code.append(row);
+    });
+  }
+  for (const m of c.marks) {
+    const row = code.children[m.line - 1];
+    const k = Math.max(0, Math.min(1, (t - m.at) / 0.4));
+    row.querySelector(".band").style.background = m.color;
+    row.querySelector(".band").style.opacity = k;
+    const tag = row.querySelector(".tag");
+    tag.textContent = m.tag;
+    tag.style.color = m.tagColor;
+    tag.style.opacity = k;
+  }
+};
+</script>
+</body>
+</html>

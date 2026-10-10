@@ -1,0 +1,323 @@
+{
+ "options": {
+  "strategy": "git",
+  "agents": 16,
+  "tasks": 48,
+  "seed": 1,
+  "work": [
+   5000,
+   20000
+  ],
+  "reworkMs": 30000,
+  "gitRepo": "bench-git"
+ },
+ "at": "2026-10-10T12:52:20.694Z",
+ "git": {
+  "blockedMs": 3295924,
+  "reworkMs": 3060000,
+  "conflicts": 102,
+  "rejectedPushes": 151,
+  "outcomes": {
+   "landed": 46,
+   "needs_person": 2
+  },
+  "log": [
+   {
+    "at": 1791636755099,
+    "agent": "agent-13",
+    "task": 12,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636757734,
+    "agent": "agent-4",
+    "task": 3,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636758684,
+    "agent": "agent-14",
+    "task": 13,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636759520,
+    "agent": "agent-7",
+    "task": 6,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636760335,
+    "agent": "agent-1",
+    "task": 0,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636761199,
+    "agent": "agent-9",
+    "task": 8,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636763741,
+    "agent": "agent-6",
+    "task": 5,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636765827,
+    "agent": "agent-3",
+    "task": 2,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636767603,
+    "agent": "agent-2",
+    "task": 1,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636768665,
+    "agent": "agent-13",
+    "task": 16,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636770485,
+    "agent": "agent-7",
+    "task": 19,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636771871,
+    "agent": "agent-16",
+    "task": 15,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636777034,
+    "agent": "agent-13",
+    "task": 25,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636777879,
+    "agent": "agent-2",
+    "task": 24,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636779723,
+    "agent": "agent-7",
+    "task": 26,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636780981,
+    "agent": "agent-9",
+    "task": 21,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636785885,
+    "agent": "agent-16",
+    "task": 27,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636789076,
+    "agent": "agent-2",
+    "task": 29,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636792791,
+    "agent": "agent-9",
+    "task": 31,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636799805,
+    "agent": "agent-8",
+    "task": 7,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636801175,
+    "agent": "agent-7",
+    "task": 30,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636803177,
+    "agent": "agent-11",
+    "task": 10,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636806859,
+    "agent": "agent-16",
+    "task": 32,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636808746,
+    "agent": "agent-14",
+    "task": 18,
+    "outcome": "needs_person"
+   },
+   {
+    "at": 1791636809551,
+    "agent": "agent-2",
+    "task": 33,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636810983,
+    "agent": "agent-9",
+    "task": 34,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636815043,
+    "agent": "agent-11",
+    "task": 37,
+    "outcome": "needs_person"
+   },
+   {
+    "at": 1791636817259,
+    "agent": "agent-8",
+    "task": 35,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636820134,
+    "agent": "agent-14",
+    "task": 39,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636821360,
+    "agent": "agent-2",
+    "task": 40,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636822747,
+    "agent": "agent-16",
+    "task": 38,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636824887,
+    "agent": "agent-13",
+    "task": 28,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636827059,
+    "agent": "agent-8",
+    "task": 43,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636830231,
+    "agent": "agent-2",
+    "task": 45,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636834187,
+    "agent": "agent-14",
+    "task": 44,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636863843,
+    "agent": "agent-16",
+    "task": 46,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636866686,
+    "agent": "agent-1",
+    "task": 20,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636896798,
+    "agent": "agent-12",
+    "task": 11,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636929031,
+    "agent": "agent-10",
+    "task": 9,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636960416,
+    "agent": "agent-9",
+    "task": 41,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791636992976,
+    "agent": "agent-11",
+    "task": 42,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637026151,
+    "agent": "agent-4",
+    "task": 17,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637063837,
+    "agent": "agent-13",
+    "task": 47,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637095923,
+    "agent": "agent-7",
+    "task": 36,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637127926,
+    "agent": "agent-6",
+    "task": 22,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637160255,
+    "agent": "agent-3",
+    "task": 23,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637195105,
+    "agent": "agent-15",
+    "task": 14,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791637232282,
+    "agent": "agent-5",
+    "task": 4,
+    "outcome": "landed"
+   }
+  ],
+  "errors": [],
+  "wallMs": 483255,
+  "final": {
+   "goalsOnTrunk": 46,
+   "green": true,
+   "passed": 48,
+   "failed": 0
+  }
+ }
+}

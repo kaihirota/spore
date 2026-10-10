@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore stage</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #1c2430; }
+  iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 1080px; border: 0; background: #eef0f2; }
+  .term {
+    position: absolute; left: 1440px; top: 0; width: 480px; height: 1080px; box-sizing: border-box;
+    padding: 22px 20px; background: #1c2430; color: #d6dbe1;
+    font: 14px/1.5 "IBM Plex Mono", monospace; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .line { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 4px; }
+  .cmd { color: #ffffff; }
+  .cmd::before { content: "$ "; color: #8a95a3; }
+  .warn { color: #e8b04a; }
+  .ok { color: #5cc290; }
+  .bad { color: #ef7f6c; }
+  .dim { color: #8a95a3; }
+  .cursor { position: absolute; left: 0; top: 0; width: 28px; height: 28px; pointer-events: none; opacity: 0; transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.3s; z-index: 10; }
+  .cursor.shown { opacity: 1; }
+  .ripple { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 3px solid #2f5fb3; opacity: 0; pointer-events: none; z-index: 9; }
+  .ripple.go { animation: ripple 0.6s ease-out 1; }
+  @keyframes ripple { from { opacity: 0.9; transform: scale(0.4); } to { opacity: 0; transform: scale(1.4); } }
+</style>
+</head>
+<body>
+<iframe id="dash" src="/dash#key=local"></iframe>
+<div class="term" id="term"></div>
+<svg class="cursor" id="cursor" viewBox="0 0 28 28"><path d="M4 2 L4 22 L9.5 17 L13 25 L16.5 23.5 L13 15.8 L20.5 15.8 Z" fill="#1c2430" stroke="#ffffff" stroke-width="1.6"/></svg>
+<div class="ripple" id="ripple"></div>
+<script>
+const term = document.getElementById("term");
+/** Appends a line to the terminal panel; kind is cmd, warn, ok, bad, dim or empty; mark names the block it belongs to. */
+window.termLine = (text, kind = "", mark = "") => {
+  const line = document.createElement("div");
+  line.className = `line ${kind}`;
+  line.textContent = text;
+  if (mark) line.dataset.mark = mark;
+  term.append(line);
+  while (term.children.length > 60) term.firstChild.remove();
+};
+/** Where each marked region of the dashboard and each marked terminal block is on screen, as [x, y, w, h]. */
+window.regions = () => {
+  const out = {};
+  // Rects inside the dashboard frame are in its own pixels; rects on this page carry the page zoom.
+  const zoom = Number(document.documentElement.style.zoom) || 1;
+  const put = (name, rect, scale = 1) => {
+    const [x, y, w, h] = [rect.left, rect.top, rect.width, rect.height].map((v) => v / scale);
+    if (w > 0 && h > 0 && y + h > 0 && y < 1080) out[name] = [x, y, w, h].map(Math.round);
+  };
+  const doc = document.getElementById("dash").contentDocument;
+  // Where an element sits in the layout, without the offset of a card gliding to its new place.
+  const settled = (el) => {
+    const r = el.getBoundingClientRect();
+    const glide = new DOMMatrixReadOnly(doc.defaultView.getComputedStyle(el).transform);
+    return { left: r.left - glide.m41, top: r.top - glide.m42, right: r.right - glide.m41, bottom: r.bottom - glide.m42, width: r.width, height: r.height };
+  };
+  if (doc) {
+    for (const el of doc.querySelectorAll("[data-region]")) put(el.dataset.region, settled(el));
+    // Cards of tasks that would clash share a key; their region is the box around all of them.
+    const groups = {};
+    for (const el of doc.querySelectorAll("[data-clash]")) (groups[el.dataset.clash] ??= []).push(settled(el));
+    for (const [key, rects] of Object.entries(groups)) {
+      const left = Math.min(...rects.map((r) => r.left)), top = Math.min(...rects.map((r) => r.top));
+      put(`cluster:${key}`, { left, top, width: Math.max(...rects.map((r) => r.right)) - left, height: Math.max(...rects.map((r) => r.bottom)) - top });
+    }
+    for (const el of doc.querySelectorAll("li[data-agent]")) put(`agent:${el.dataset.agent}`, settled(el));
+    for (const el of doc.querySelectorAll("[data-suggest]")) put(`suggest:${el.dataset.suggest}`, settled(el.closest("li")));
+    const dialog = doc.getElementById("record");
+    if (dialog?.open) {
+      put("dialog", dialog.getBoundingClientRect());
+      for (const side of ["trunk", "incoming", "fix"]) { const pane = dialog.querySelector(`.pane.${side}`); if (pane) put(`pane:${side}`, pane.getBoundingClientRect()); }
+    }
+    const take = doc.querySelector('button[data-keep="incoming"]');
+    if (take) put("take", take.getBoundingClientRect());
+  }
+  const blocks = {};
+  for (const line of document.querySelectorAll("#term .line[data-mark]")) {
+    const r = line.getBoundingClientRect();
+    const b = (blocks[line.dataset.mark] ??= { left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+    b.left = Math.min(b.left, r.left); b.top = Math.min(b.top, r.top); b.right = Math.max(b.right, r.right); b.bottom = Math.max(b.bottom, r.bottom);
+  }
+  for (const [mark, b] of Object.entries(blocks)) put(`term:${mark}`, { left: b.left, top: Math.max(0, b.top), width: b.right - b.left, height: b.bottom - Math.max(0, b.top) }, zoom);
+  return out;
+};
+// The cursor is hidden until a click needs it; it then appears a short way off and glides to its target.
+window.moveCursor = (x, y) => {
+  const cursor = document.getElementById("cursor");
+  if (!cursor.classList.contains("shown")) {
+    cursor.style.transition = "none";
+    cursor.style.transform = `translate(${x + 140}px, ${y + 90}px)`;
+    void cursor.offsetWidth;
+    cursor.style.transition = "";
+    cursor.classList.add("shown");
+  }
+  cursor.style.transform = `translate(${x - 4}px, ${y - 2}px)`;
+};
+window.hideCursor = () => document.getElementById("cursor").classList.remove("shown");
+window.clickRipple = (x, y) => {
+  const ripple = document.getElementById("ripple");
+  ripple.style.left = `${x}px`;
+  ripple.style.top = `${y}px`;
+  ripple.classList.remove("go");
+  void ripple.offsetWidth;
+  ripple.classList.add("go");
+};
+</script>
+</body>
+</html>

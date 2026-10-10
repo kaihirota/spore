@@ -1,0 +1,17 @@
+#!/bin/bash
+# Lets Wrangler build images with an older Docker: routes "docker build" to buildx and drops flags buildx 0.8 lacks.
+if [ "$1" = "build" ]; then
+  shift
+  args=()
+  skip=0
+  for a in "$@"; do
+    if [ $skip = 1 ]; then skip=0; continue; fi
+    case "$a" in
+      --provenance=*|--sbom=*) ;;
+      --provenance|--sbom) skip=1 ;;
+      *) args+=("$a") ;;
+    esac
+  done
+  exec docker buildx build "${args[@]}"
+fi
+exec docker "$@"

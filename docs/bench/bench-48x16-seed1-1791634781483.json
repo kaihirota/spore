@@ -1,0 +1,688 @@
+{
+ "options": {
+  "strategy": "both",
+  "agents": 16,
+  "tasks": 48,
+  "seed": 1,
+  "work": [
+   5000,
+   20000
+  ],
+  "reworkMs": 10000,
+  "gitRepo": "bench-git"
+ },
+ "at": "2026-10-10T12:03:31.798Z",
+ "git": {
+  "blockedMs": 1459394,
+  "reworkMs": 1010000,
+  "conflicts": 101,
+  "rejectedPushes": 189,
+  "outcomes": {
+   "landed": 46,
+   "needs_person": 2
+  },
+  "log": [
+   {
+    "at": 1791633827661,
+    "agent": "agent-13",
+    "task": 12,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633829936,
+    "agent": "agent-4",
+    "task": 3,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633831332,
+    "agent": "agent-14",
+    "task": 13,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633832204,
+    "agent": "agent-9",
+    "task": 8,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633833331,
+    "agent": "agent-7",
+    "task": 6,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633834186,
+    "agent": "agent-1",
+    "task": 0,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633836333,
+    "agent": "agent-6",
+    "task": 5,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633838276,
+    "agent": "agent-3",
+    "task": 2,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633840337,
+    "agent": "agent-2",
+    "task": 1,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633841492,
+    "agent": "agent-13",
+    "task": 16,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633843128,
+    "agent": "agent-15",
+    "task": 14,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633844624,
+    "agent": "agent-16",
+    "task": 15,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633849787,
+    "agent": "agent-13",
+    "task": 25,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633850821,
+    "agent": "agent-2",
+    "task": 24,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633852678,
+    "agent": "agent-8",
+    "task": 7,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633853870,
+    "agent": "agent-15",
+    "task": 26,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633857456,
+    "agent": "agent-1",
+    "task": 21,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633859142,
+    "agent": "agent-16",
+    "task": 27,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633860145,
+    "agent": "agent-11",
+    "task": 10,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633861112,
+    "agent": "agent-14",
+    "task": 18,
+    "outcome": "needs_person"
+   },
+   {
+    "at": 1791633862208,
+    "agent": "agent-2",
+    "task": 29,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633865542,
+    "agent": "agent-15",
+    "task": 31,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633867593,
+    "agent": "agent-6",
+    "task": 22,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633870396,
+    "agent": "agent-7",
+    "task": 20,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633872992,
+    "agent": "agent-8",
+    "task": 30,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633876297,
+    "agent": "agent-13",
+    "task": 28,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633877954,
+    "agent": "agent-15",
+    "task": 37,
+    "outcome": "needs_person"
+   },
+   {
+    "at": 1791633879327,
+    "agent": "agent-11",
+    "task": 34,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633882578,
+    "agent": "agent-6",
+    "task": 38,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633886296,
+    "agent": "agent-5",
+    "task": 4,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633891936,
+    "agent": "agent-14",
+    "task": 35,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633894822,
+    "agent": "agent-1",
+    "task": 32,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633897918,
+    "agent": "agent-5",
+    "task": 45,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633902711,
+    "agent": "agent-8",
+    "task": 40,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633906074,
+    "agent": "agent-7",
+    "task": 39,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633907378,
+    "agent": "agent-6",
+    "task": 44,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633908561,
+    "agent": "agent-11",
+    "task": 43,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633910632,
+    "agent": "agent-13",
+    "task": 41,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633923444,
+    "agent": "agent-3",
+    "task": 23,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633934714,
+    "agent": "agent-15",
+    "task": 42,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633948970,
+    "agent": "agent-1",
+    "task": 47,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633961710,
+    "agent": "agent-14",
+    "task": 46,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633973591,
+    "agent": "agent-12",
+    "task": 11,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633985047,
+    "agent": "agent-4",
+    "task": 17,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791633997841,
+    "agent": "agent-9",
+    "task": 19,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791634010270,
+    "agent": "agent-10",
+    "task": 9,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791634024227,
+    "agent": "agent-2",
+    "task": 36,
+    "outcome": "landed"
+   },
+   {
+    "at": 1791634036311,
+    "agent": "agent-16",
+    "task": 33,
+    "outcome": "landed"
+   }
+  ],
+  "errors": [],
+  "wallMs": 214742,
+  "final": {
+   "goalsOnTrunk": 46,
+   "green": true,
+   "passed": 48,
+   "failed": 0
+  }
+ },
+ "spore": {
+  "blockedMs": 2386,
+  "outcomes": {
+   "accepted": 48
+  },
+  "log": [
+   {
+    "at": 1791634135615,
+    "agent": "agent-13",
+    "task": 12,
+    "taskId": "14",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634135679,
+    "agent": "agent-15",
+    "task": 14,
+    "taskId": "13",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634135958,
+    "agent": "agent-4",
+    "task": 3,
+    "taskId": "1",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634136785,
+    "agent": "agent-14",
+    "task": 13,
+    "taskId": "3",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634138587,
+    "agent": "agent-7",
+    "task": 6,
+    "taskId": "15",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634138941,
+    "agent": "agent-1",
+    "task": 0,
+    "taskId": "4",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634138986,
+    "agent": "agent-9",
+    "task": 8,
+    "taskId": "12",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634141894,
+    "agent": "agent-5",
+    "task": 4,
+    "taskId": "2",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634142436,
+    "agent": "agent-6",
+    "task": 5,
+    "taskId": "6",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634143956,
+    "agent": "agent-3",
+    "task": 2,
+    "taskId": "5",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634144748,
+    "agent": "agent-2",
+    "task": 1,
+    "taskId": "7",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634147237,
+    "agent": "agent-14",
+    "task": 19,
+    "taskId": "20",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634147340,
+    "agent": "agent-8",
+    "task": 7,
+    "taskId": "11",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634148673,
+    "agent": "agent-12",
+    "task": 11,
+    "taskId": "16",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634148979,
+    "agent": "agent-11",
+    "task": 10,
+    "taskId": "8",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634149244,
+    "agent": "agent-13",
+    "task": 16,
+    "taskId": "17",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634149436,
+    "agent": "agent-10",
+    "task": 9,
+    "taskId": "9",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634150047,
+    "agent": "agent-16",
+    "task": 15,
+    "taskId": "10",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634151628,
+    "agent": "agent-7",
+    "task": 20,
+    "taskId": "22",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634155735,
+    "agent": "agent-3",
+    "task": 25,
+    "taskId": "26",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634155765,
+    "agent": "agent-15",
+    "task": 17,
+    "taskId": "18",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634156534,
+    "agent": "agent-6",
+    "task": 24,
+    "taskId": "25",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634158068,
+    "agent": "agent-2",
+    "task": 26,
+    "taskId": "27",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634158286,
+    "agent": "agent-4",
+    "task": 18,
+    "taskId": "19",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634159508,
+    "agent": "agent-9",
+    "task": 22,
+    "taskId": "21",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634161083,
+    "agent": "agent-1",
+    "task": 21,
+    "taskId": "23",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634162555,
+    "agent": "agent-12",
+    "task": 29,
+    "taskId": "30",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634163131,
+    "agent": "agent-13",
+    "task": 31,
+    "taskId": "31",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634163496,
+    "agent": "agent-14",
+    "task": 27,
+    "taskId": "28",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634164225,
+    "agent": "agent-5",
+    "task": 23,
+    "taskId": "24",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634166523,
+    "agent": "agent-8",
+    "task": 28,
+    "taskId": "29",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634169653,
+    "agent": "agent-15",
+    "task": 36,
+    "taskId": "37",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634171292,
+    "agent": "agent-7",
+    "task": 34,
+    "taskId": "35",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634171497,
+    "agent": "agent-11",
+    "task": 30,
+    "taskId": "33",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634171817,
+    "agent": "agent-16",
+    "task": 33,
+    "taskId": "34",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634171849,
+    "agent": "agent-10",
+    "task": 32,
+    "taskId": "32",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634172098,
+    "agent": "agent-6",
+    "task": 37,
+    "taskId": "38",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634172492,
+    "agent": "agent-4",
+    "task": 39,
+    "taskId": "41",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634173445,
+    "agent": "agent-2",
+    "task": 38,
+    "taskId": "40",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634173887,
+    "agent": "agent-9",
+    "task": 40,
+    "taskId": "42",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634174822,
+    "agent": "agent-5",
+    "task": 45,
+    "taskId": "47",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634175153,
+    "agent": "agent-13",
+    "task": 43,
+    "taskId": "46",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634176700,
+    "agent": "agent-3",
+    "task": 35,
+    "taskId": "39",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634177316,
+    "agent": "agent-14",
+    "task": 44,
+    "taskId": "44",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634177467,
+    "agent": "agent-8",
+    "task": 46,
+    "taskId": "48",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634185301,
+    "agent": "agent-1",
+    "task": 41,
+    "taskId": "43",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634186696,
+    "agent": "agent-12",
+    "task": 42,
+    "taskId": "45",
+    "outcome": "accepted"
+   },
+   {
+    "at": 1791634190970,
+    "agent": "agent-15",
+    "task": 47,
+    "taskId": "49",
+    "outcome": "accepted"
+   }
+  ],
+  "errors": [],
+  "taskStates": {
+   "merged": 22,
+   "resolved": 24,
+   "escalated": 2
+  },
+  "agentsDoneMs": 65606,
+  "wallMs": 654588,
+  "records": {
+   "total": 26,
+   "conflicts": 25,
+   "failingTests": 1,
+   "resolved": 24,
+   "escalated": 2
+  },
+  "final": {
+   "goalsOnTrunk": 46,
+   "green": true,
+   "passed": 48,
+   "failed": 0
+  }
+ }
+}

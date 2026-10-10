@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spore close</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #eef0f2; color: #1c2430; font-family: "Archivo", sans-serif; }
+  .shot { position: absolute; inset: 0; background-size: cover; filter: saturate(0.6); }
+  .veil { position: absolute; inset: 0; background: #eef0f2; }
+  .facts { position: absolute; left: 240px; top: 150px; }
+  .fact { display: flex; align-items: baseline; gap: 28px; margin: 0 0 18px; }
+  .fact b { width: 120px; text-align: right; font-size: 76px; font-weight: 800; font-stretch: 125%; line-height: 1; }
+  .fact span { font-size: 38px; font-weight: 600; }
+  /* Right of the facts and above the captions band, so nothing overlaps. */
+  .end { position: absolute; left: 1340px; top: 380px; }
+  .end .mark { font-size: 120px; font-weight: 800; font-stretch: 125%; letter-spacing: -0.02em; line-height: 1; }
+  .end .meta { margin-top: 18px; font-size: 32px; font-weight: 500; color: #5d6875; white-space: pre-line; line-height: 1.35; }
+</style>
+</head>
+<body>
+<div class="shot" id="shot"></div>
+<div class="veil" id="veil"></div>
+<div class="facts" id="facts"></div>
+<div class="end" id="end"><div class="mark">Spore</div><div class="meta" id="meta"></div></div>
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+
+/** Draws the card t seconds into the narration, given window.CUES = { shot, facts: [{ n, text, color, at }], end, meta }. */
+window.setTime = (t) => {
+  const c = window.CUES;
+  const facts = document.getElementById("facts");
+  if (!facts.children.length) {
+    document.getElementById("shot").style.backgroundImage = `url("${c.shot}")`;
+    document.getElementById("meta").textContent = c.meta;
+    for (const f of c.facts) {
+      const row = document.createElement("div");
+      row.className = "fact";
+      row.innerHTML = `<b></b><span></span>`;
+      row.querySelector("b").textContent = f.n;
+      row.querySelector("b").style.color = f.color;
+      row.querySelector("span").textContent = f.text;
+      facts.append(row);
+    }
+  }
+  // The finished dashboard shows through at first, then a veil settles so the facts read clearly.
+  document.getElementById("veil").style.opacity = 0.55 + 0.37 * ease(t / 1.2);
+  c.facts.forEach((f, i) => {
+    const row = facts.children[i];
+    row.style.opacity = ease((t - f.at) / 0.45);
+    row.style.transform = `translateY(${(1 - ease((t - f.at) / 0.45)) * 14}px)`;
+  });
+  document.getElementById("end").style.opacity = ease((t - c.end) / 0.6);
+};
+</script>
+</body>
+</html>

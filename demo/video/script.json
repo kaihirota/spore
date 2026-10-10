@@ -1,0 +1,72 @@
+[
+  {
+    "id": "open",
+    "visual": "The board as the run starts: nine agents fill In Progress. Cut to src/flags.js, set flag highlighted.",
+    "narration": "This is Spore, running on Cloudflare. Nine agents working on the same repository. Each one has a goal: set the rate limit, sort the flag names, log every flag change. Three of them are about to rewrite the same line of set flag. They do not know that yet. A fourth is changing a different function in the same file. None of them owns a file. None of them is waiting for a review."
+  },
+  {
+    "id": "touching",
+    "visual": "In Progress: the three set flag agents' cards marked as clashing with each other; agent-5, sorting flag names, with no warning; a terminal call to GET /touching for set flag.",
+    "narration": "They push early and keep working. Before any of them submits, each of the three learns the names and goals of the other two. Now look at agent five, the one sorting flag names. Same file, different function. It hears nothing, because its lines overlap no one else's. Spore watches every fork's pushes and trial-merges each push against the other agents' work on the same files. Only an actual line conflict produces a warning. Any agent can ask the same question directly: who is touching set flag right now."
+  },
+  {
+    "id": "title",
+    "visual": "Title card. The rule appears first; then a two-line card: pull request, lock, each crossed out as it is named.",
+    "narration": "Spore lets a swarm of agents work on one repository at once, under one rule: every task ships a test for its goal, and trunk takes a change only if every goal test already on trunk still passes. A pull request would have made those three wait for a reviewer. A lock would have made them guess which files they needed before they started. This does neither. Git decides what actually conflicts. Agents hear about each other while they work, so a clash can often be avoided: one waits, or hands its task over. And when a conflict does happen, it becomes a work item for another agent, and only a contradiction reaches a person."
+  },
+  {
+    "id": "agent-view",
+    "visual": "The flag service's files and tests. Terminal: one agent starts a task, pushes, submits. Its goal test file appears under test/goals.",
+    "narration": "Here is what an agent sees. A small feature flag service with tests. Start a task, and you get your own fork, a plain git repository. Push as often as you like. Submit when you are done. No step needs a person. Each agent also commits a test for its own goal alongside its change. Remember that test."
+  },
+  {
+    "id": "second",
+    "visual": "agent-8 waits while the other two submit, rebuilds on the new trunk, reports clear, and merges.",
+    "narration": "Back to agents six, seven and eight. A warning is advice, not a lock. Two of them keep going. Agent eight decides to go next. It waits until the other two are through, rebuilds its change on the new trunk, checks again, and submits."
+  },
+  {
+    "id": "handover",
+    "visual": "In Progress: the coordinator's question on agent-9's and agent-2's cards, both answer required, the verdict hands agent-9's task to agent-2; agent-2's two changes reach the trunk line.",
+    "narration": "A warning can also end in a handover. Agent nine starts late, on the health check that agent two is already changing. The coordinator asks them both: is your change here required for your task? Both say yes. So agent two, which started first, keeps going, and agent nine hands its task over once Spore has checked the tests still pass. Agent nine moves on. Agent two finishes its own change, then does agent nine's on the new trunk."
+  },
+  {
+    "id": "merging",
+    "visual": "Cards move from In Progress through Merging to Done (Trunk); a clashing change becomes a record in the Conflict lane while its agent moves on.",
+    "narration": "Submitted work goes to one integrator per repository. It merges one change at a time, runs every test, goal tests included, and pushes trunk only if they all pass. A clean change reaches trunk in a few seconds. A change that clashes with something already merged does not bounce back to its author. It becomes a record in the queue, with both goals and the conflicting lines, and the author moves on to the next task. Trunk is never rolled back. The board shows all of it: what each agent has in progress, what is under review, and trunk."
+  },
+  {
+    "id": "resolver",
+    "visual": "Record view: trunk side, incoming side, the resolver's fix. Then the fix curving back onto the trunk line.",
+    "narration": "Who clears the queue? A resolver agent, also running on Cloudflare. It claims the record, forks the latest trunk, merges the incoming change, and hands the conflicted file to a model with both goals. Its instruction: rewrite the file so both goals hold, or say that you cannot. Here is the record: agent seven's validation, against agent six's audit log. [pause] Left, what trunk has. [pause] Middle, the incoming change. [pause] Right, the fix: one set flag that does both. [pause] The fix goes through the same merge and the same tests as any other change. If the model got this wrong, one of them fails, and the fix never reaches trunk. It passes and merges."
+  },
+  {
+    "id": "escalation",
+    "visual": "The rate limit record as a red card in Review's Conflict lane, with its reason. The cursor clicks Take incoming. Trunk advances.",
+    "narration": "Then two goals that cannot both be true. One agent wants the rate limit at exactly two hundred. Another wants exactly fifty. The coordinator asked the model about the pair as soon as both had pushed, and the answer was that no change can satisfy both. So when the second one submits, its record goes straight to a person, without a resolver run. This is the only time a person is needed. The person sees trunk, incoming, and the reason, and clicks once: take the incoming side. The losing goal's test is dropped. Every other test still runs. The change merges."
+  },
+  {
+    "id": "why",
+    "visual": "Terminal call to GET /why for src/flags.js: each goal, agent, and the record it came through.",
+    "narration": "Months from now, an agent opens set flag and wants to know why it logs, validates, and returns the old value. It asks. Every merge carries the task that made it and the record it came through. So the answer lists every goal that changed the file and the agent behind each one. It also shows the two goals that had to be reconciled."
+  },
+  {
+    "id": "results",
+    "visual": "Results card: Spore and plain git side by side, each row appearing as it is named.",
+    "narration": "Does it hold up at scale? We ran forty-eight tasks with sixteen scripted agents twice on Artifacts: once through Spore, and once through plain git, where every agent rebases, retests and pushes, and redoes its change after a conflict. Both ended with forty-six goals on trunk, and trunk green. The two left out were one side of the contradiction and one side of the pair that break each other, and both went to a person. Under plain git, agents spent twenty-four agent-minutes blocked on version control, and redid a hundred and one conflicts. In Spore, they were blocked for three seconds in all, and finished every task in about a minute, a third of the time. Trunk settled about a minute after plain git's, as resolvers worked through the queue. One fix settled eight clashes on the same file at once. And when redoing a change takes thirty seconds instead of ten, plain git takes eight minutes. Spore never redoes a change, so its run stays the same."
+  },
+  {
+    "id": "connect",
+    "visual": "Terminal card: npm run setup, an agent key, claude mcp add, the tool list.",
+    "narration": "Trying it takes one command. npm run setup creates the repository and the queue, deploys, and prints the dashboard link. Each agent gets its own key, and a key can act only for its own agent's tasks. And Spore speaks MCP, so a Claude Code session joins as an agent with one line. It starts a task, pushes, reports, and submits without waiting for the merge."
+  },
+  {
+    "id": "architecture",
+    "visual": "Architecture diagram, each Cloudflare product highlighted as it is named.",
+    "narration": "It runs entirely on Cloudflare. Artifacts holds trunk and a fork for every task. Event subscriptions and Queues deliver every push. One Durable Object per repository runs the merges and the coordinator, and stores the tasks, warnings and records. Its Container runs git and the tests. Workers AI judges whether two goals contradict and resolves conflicts, and a Worker serves the API and the dashboard. Agents never hold a write token for trunk. Only the integrator does, for ten minutes at a time. Tests run as an unprivileged user, git hooks are off, and a hung test is killed after five minutes."
+  },
+  {
+    "id": "close",
+    "visual": "Closing card over the finished dashboard: the run's own numbers, the repository, MIT license.",
+    "narration": "Nine agents, one repository, one run. Three of them were headed for the same line and knew it before any of them submitted. One chose to go next, after the others. One handed its task to the agent already in those lines. One conflict was fixed by a model and checked by every goal's test. One contradiction took a single click. Every clean change merged in seconds. Nothing was discarded unless a person decided. The code is open source under the MIT license, and the repository has everything you need to run it on your own Cloudflare account."
+  }
+]
